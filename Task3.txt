@@ -1,0 +1,81 @@
+# Vulnerability Assessment and Reporting
+
+## **Introduction**
+The purpose of this task was to identify, analyze, and document security vulnerabilities present in a Windows 11 environment.  
+Two different vulnerability scanning tools were used — **Nessus Essentials** (on Windows) and **OpenVAS** (on Kali Linux) — to conduct a comprehensive assessment.  
+The assessment aimed to highlight misconfigurations, insecure services, and potential risks that could be exploited by attackers.
+
+## **Tools Used**
+- **Windows 11 OS** – Target operating system for vulnerability assessment  
+- **Nessus Essentials** – Performed a detailed localhost scan to identify vulnerabilities  
+- **Kali Linux** – Penetration testing environment used for additional scanning  
+- **OpenVAS** – Open-source vulnerability scanner used for cross-validation of findings  
+
+## **Procedure**
+1. **Setup and Configuration**
+   - Installed and configured **Nessus Essentials** on Windows 11  
+   - Prepared **Kali Linux** environment with **OpenVAS** installed  
+
+2. **Scanning with Nessus Essentials**
+   - Launched a **localhost scan** targeting `127.0.0.1`  
+   - Allowed Nessus to enumerate services, ports, and running applications  
+   - Exported the final scan results as an HTML file (converted to PDF for documentation)
+
+3. **Scanning with OpenVAS**
+   - Ran authenticated and unauthenticated scans against the same host from Kali Linux  
+   - Collected findings to compare with Nessus results
+
+4. **Analysis and Documentation**
+   - Reviewed all detected vulnerabilities  
+   - Identified common issues between the two scanning tools  
+   - Summarized key risks for reporting  
+
+## **Key Findings (from Nessus Essentials)**
+
+### 1. SMB Signing Not Required – **Medium Risk**
+- **Description:** The SMB service does not require message signing, which allows an attacker to perform man-in-the-middle attacks by intercepting SMB traffic  
+- **Affected Port:** TCP 445  
+- **Recommendation:** Enable *"Microsoft network server: Digitally sign communications (always)"* in Group Policy
+
+### 2. SSL Certificate Cannot Be Trusted – **Medium Risk**
+- **Description:** The SSL/TLS certificate used by the scanned service is self-signed or issued by an unknown Certificate Authority  
+- **Affected Port:** TCP 8834  
+- **Risk:** May allow man-in-the-middle attacks due to unverified server identity  
+- **Recommendation:** Obtain and install a valid certificate from a trusted CA
+
+### 3. Multiple RPC Services Enumeration – **Information Level**
+- **Description:** Numerous Distributed Computing Environment / Remote Procedure Call (DCE/RPC) services were detected  
+- **Risk:** Could provide attackers with service-specific details for targeted exploits  
+- **Recommendation:** Restrict unnecessary RPC services and limit exposure to trusted networks
+
+
+## **Key Findings (from OpenVAS)**
+
+### 1. Outdated Windows Updates – **Medium Risk**
+- **Description:** Several important Windows security updates are missing, increasing exposure to known exploits.  
+- **Recommendation:** Apply all pending updates and enable automatic updates.
+
+### 2. SMBv1 Enabled – **High Risk**
+- **Description:** SMBv1 protocol is still enabled, which is vulnerable to multiple exploits such as EternalBlue.  
+- **Recommendation:** Disable SMBv1 and use SMBv2/SMBv3.
+
+### 3. Weak TLS Configuration – **Medium Risk**
+- **Description:** The server supports weak TLS ciphers and older protocols (TLS 1.0 / 1.1).  
+- **Recommendation:** Enforce TLS 1.2 or higher and disable weak ciphers.
+
+### 4. Unnecessary Open Ports – **Low Risk**
+- **Description:** Several unused ports are listening, increasing the system’s attack surface.  
+- **Recommendation:** Close unused ports and restrict access via firewall rules.
+
+The vulnerability assessment revealed several **medium and high-severity issues** related to:
+- Weak SMB security settings (SMB signing not enforced, SMBv1 enabled)
+- Use of untrusted/self-signed SSL certificates
+- Weak TLS configurations
+- Unnecessary open ports
+
+By addressing these vulnerabilities — particularly disabling SMBv1, enforcing SMB signing, and using valid SSL certificates — the system’s resistance to common attack vectors can be significantly improved.  
+The Nessus and OpenVAS results complemented each other, providing a more complete security overview.
+
+## **Attachments**
+- **Nessus Essentials Report (PDF)**
+- **OpenVAS Scan Summary (HTML/PDF)**
